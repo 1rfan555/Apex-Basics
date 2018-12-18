@@ -1,0 +1,60 @@
+Challenge 8:
+Create an Apex class that uses Batch Apex to update Lead records.
+Create an Apex class that implements the Database.Batchable interface to update all Lead records in the org with a specific LeadSource. Write unit tests that achieve 100% code coverage for the class.
+Create an Apex class called 'LeadProcessor' that uses the Database.Batchable interface.
+Use a QueryLocator in the start method to collect all Lead records in the org.
+The execute method must update all Lead records in the org with the LeadSource value of 'Dreamforce'.
+Create an Apex test class called 'LeadProcessorTest'.
+In the test class, insert 200 Lead records, execute the 'LeadProcessor' Batch class and test that all Lead records were updated correctly.
+The unit tests must cover all lines of code included in the LeadProcessor class, resulting in 100% code coverage.
+Run your test class at least once (via 'Run All' tests the Developer Console) before attempting to verify this challenge.
+
+Solution:
+
+1.LeadProcessor.apxc
+global class LeadProcessor implements Database.Batchable<sObject> {
+    global Integer count = 0;
+    
+    global Database.QueryLocator start (Database.BatchableContext bc) {
+        return Database.getQueryLocator('Select Id, LeadSource from lead');
+    }
+    
+    global void execute (Database.BatchableContext bc,List<Lead> l_lst) {
+        List<lead> l_lst_new = new List<lead>();
+        for(lead l : l_lst) {
+            l.leadsource = 'Dreamforce';
+            l_lst_new.add(l);
+            count+=1;
+        }
+        update l_lst_new;
+    }
+	
+    global void finish (Database.BatchableContext bc) {
+        system.debug('count = '+count);
+    }
+}
+2.LeadProcessorTest
+@isTest
+public class LeadProcessorTest {
+    
+    @isTest    
+    public static void testit() {
+        List<lead> l_lst = new List<lead>();
+        for (Integer i = 0; i<200; i++) {
+            Lead l = new lead();
+            l.LastName = 'name'+i;
+            l.company = 'company';
+            l.Status =  'somestatus';
+            l_lst.add(l);
+        }
+        insert l_lst;
+        
+        test.startTest();
+        
+        Leadprocessor lp = new Leadprocessor();
+        Id batchId = Database.executeBatch(lp);
+        Test.stopTest();
+            
+    }
+
+}
