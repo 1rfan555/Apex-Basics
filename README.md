@@ -1,2 +1,2 @@
-# Apex-Triggers
-Write Apex triggers to perform custom database actions.
+# Apex
+This rep have all trailhead's solutions(except objective) related with Apex
