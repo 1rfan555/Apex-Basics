@@ -1,0 +1,49 @@
+Challenge 5:
+
+Create an Apex class that returns contacts based on incoming parameters.
+For this challenge, you will need to create a class that has a method accepting two strings. The method searches for contacts that have a last name matching the first string and a mailing postal code matching the second. It gets the ID and Name of those contacts and returns them.
+The Apex class must be called ContactSearch and be in the public scope
+The Apex class must have a public static method called searchForContacts
+The method must accept two incoming strings as parameters
+The method should then find any contact that has a last name matching the first string, and mailing postal code (API name: MailingPostalCode) matching the second string
+The method should finally return a list of Contact records of type List that includes the ID and Name fields
+
+Solution:
+public class ContactSearch {
+    public static List<Contact> searchForContacts(String lName, String pCode){
+        
+        //use syntax to give refrence of paramameter name ex. :para_name
+       return [SELECT Id, Name, LastName, MailingPostalCode
+                                     FROM Contact
+                                     WHERE LastName =:lName AND MailingPostalCode = :pCode];
+    }
+
+}
+
+/*
+ Let's view it line-by-line:
+
+public class ContactSearch
+This is just a class definition. Public says that this class is in public scope
+
+public static List<Contact> searchForContacts(String lastName, String mailingPostalCode)
+This is method declaration. Again, public keyword makes this method public accessible(public scope).
+Static means that this method is class-method(static-method) and not instance-method. Difference is that for instance-method you would omit static keyword, but you would need an instance of that class to call this method.
+List<Contact> is return type of the method. It means that this method will return a List of Contact objects.
+searchForContacts is method name, use it to call this method.
+String lastName, String mailingPostalCode are parameters that are expected by this method.
+List<Contact> retList = [SELECT Id, Name, LastName, MailingPostalCode
+                                 FROM Contact
+                                 WHERE LastName = :lastName AND MailingPostalCode = :mailingPostalCode];
+
+This line assigns the result of the query to retList variable.
+List<Contact> retList makes a variable with name retList of type List<Contact>.
+SELECT Id, Name, LastName, MailingPostalCode FROM Contact is a simple query that will return all contacts. However, you only need the ones that match given parameters, so the next line of the query is:
+WHERE LastName = :lastName AND MailingPostalCode = :mailingPostalCode
+This adds a filter to the query, so that it will only return results which match LastName and MailingPostalCode with given parameters.
+
+Note the : in the query before the parameters:
+
+If you want to use variables in your query, they should have : in front. That tells your code that it's not the value to be searched for, but a variable from the code
+
+return retList; will return the list of matching contacts that you just found*/
