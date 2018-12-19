@@ -29,12 +29,12 @@ public class AccountProcessorTest {
     public static testMethod void testAccountProcessorTest(){
         Test.startTest();
         Account a = new Account();
-        a.Name = 'Test Account';
+        a.Name = 'The Pirates';
         insert a;
 
         Contact cont = new Contact();
-        cont.FirstName ='Bob';
-        cont.LastName ='Masters';
+        cont.FirstName ='jack';
+        cont.LastName ='Sparrow';
         cont.AccountId = a.Id;
         insert cont;
 
