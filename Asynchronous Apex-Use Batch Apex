@@ -12,49 +12,57 @@ Run your test class at least once (via 'Run All' tests the Developer Console) be
 Solution:
 
 1.LeadProcessor.apxc
-global class LeadProcessor implements Database.Batchable<sObject> {
-    global Integer count = 0;
-    
-    global Database.QueryLocator start (Database.BatchableContext bc) {
-        return Database.getQueryLocator('Select Id, LeadSource from lead');
-    }
-    
-    global void execute (Database.BatchableContext bc,List<Lead> l_lst) {
-        List<lead> l_lst_new = new List<lead>();
-        for(lead l : l_lst) {
-            l.leadsource = 'Dreamforce';
-            l_lst_new.add(l);
-            count+=1;
-        }
-        update l_lst_new;
-    }
-	
-    global void finish (Database.BatchableContext bc) {
-        system.debug('count = '+count);
-    }
-}
-2.LeadProcessorTest
-@isTest
-public class LeadProcessorTest {
-    
-    @isTest    
-    public static void testit() {
-        List<lead> l_lst = new List<lead>();
-        for (Integer i = 0; i<200; i++) {
-            Lead l = new lead();
-            l.LastName = 'name'+i;
-            l.company = 'company';
-            l.Status =  'somestatus';
-            l_lst.add(l);
-        }
-        insert l_lst;
+global class LeadProcessor implements Database.Batchable<sObject>, Database.Stateful {
+    global Integer leadsProcessed = 0;
+    global Database.QueryLocator start(Database.BatchableContext bc){
         
-        test.startTest();
         
-        Leadprocessor lp = new Leadprocessor();
-        Id batchId = Database.executeBatch(lp);
-        Test.stopTest();
-            
+        return Database.getQueryLocator('select id, lastname ,status, company from Lead');
+        
+    }
+    global void execute(Database.BatchableContext bc, List<Lead> allLeads){
+        List<Lead> leads = new List<Lead>();
+        for(Lead l: allLeads){
+            l.LeadSource='Dreamforce';
+        }
+        update leads;
+        
+    }
+    global void finish(Database.BatchableContext bc){
+        System.debug(leadsProcessed + ' leads processed. Nigga!');
+        AsyncApexJob job = [SELECT Id, Status, NumberOfErrors, 
+            JobItemsProcessed,
+            TotalJobItems, CreatedBy.Email
+            FROM AsyncApexJob
+            WHERE Id = :bc.getJobId()];
+        
+        EmailManager.sendMail('jgatsby1996@gmail.com','Total Leads Porcessed are ',' '+leadsProcessed);
+        
     }
 
+}
+2.LeadProcessorTest
+
+
+@isTest
+public class LeadProcessorTest {
+
+    @testSetup
+    static void setup(){
+        List<Lead> leads = new List<Lead>();
+        for (Integer i=0;i<200;i++) {
+            leads.add(new Lead(Lastname='Last '+i, 
+                		status='Open - Not Contacted'
+                               	, company='LeadCompany'+i));
+        }
+        insert leads;
+    }
+    static testmethod void test() {        
+        Test.startTest();
+        LeadProcessor lp = new LeadProcessor();
+        Id batchId = Database.executeBatch(lp);
+        Test.stopTest();
+        // after the testing stops, assert records were updated properly
+        System.assertEquals(200, [select count() from Lead where LeadSource = 'Dreamforce']);
+    }
 }
