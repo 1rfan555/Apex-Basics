@@ -24,29 +24,26 @@ public class DailyLeadProcessor implements schedulable{
     }
 
 }
-2.DailyLeadProcessor.apxc
+2.DailyLeadProcessorTest.apxc
 @isTest
 public class DailyLeadProcessorTest {
-    
-    @isTest
-    public static void testing() {
-        
-        List<lead> l_lst = new List<lead>();
-        for(Integer i=0;i<200;i++) {
-            lead l = new lead();
-            l.lastname = 'lastname'+i;
-            l.Company = 'company'+i;
-            l_lst.add(l);
+    @testSetup
+    static void setup(){
+        List<Lead> lstOfLead = new List<Lead>();
+        for(Integer i = 1; i <= 200; i++){
+            Lead ld = new Lead(Company = 'Comp' + i ,LastName = 'LN'+i, Status = 'Working - Contacted');
+            lstOfLead.add(ld);
         }
-        insert l_lst;
-        
-        Test.startTest();
-        DailyLeadProcessor dlp = new DailyLeadProcessor ();
-        String jobId = System.Schedule('dailyleadprocessing','0 0 0 1 12 ? 2016',dlp);
-        Test.stopTest();
-        
-        List<lead> l_lst_chk = new List<lead>([select id,leadsource from lead where leadsource != 'Dreamforce']);
-        System.assertequals(0,l_lst_chk.size());
+        Insert lstOfLead;
     }
+    static testmethod void testDailyLeadProcessorScheduledJob(){
+        String sch = '0 5 12 * * ?';
+        Test.startTest();
+        String jobId = System.schedule('ScheduledApexTest', sch, new DailyLeadProcessor());
+        
+        List<Lead> lstOfLead = [SELECT Id FROM Lead WHERE LeadSource = null LIMIT 200];
+        System.assertEquals(200, lstOfLead.size());
 
+        Test.stopTest();
+    }
 }
