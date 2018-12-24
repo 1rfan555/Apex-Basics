@@ -1,0 +1,25 @@
+1.campingListItem.cmp
+
+<aura:component >
+    <aura:attribute name="item" type="Camping_Item__c" required="true"/>
+    
+    //refer object fields API for each fields given
+    <p>Name : <ui:outputText value="{!v.item.Name}"/></p>
+    
+    <p>Price:
+    <lightning:formattedNumber value="{!v.item.Price__c}" style="currency"/>
+    </p>
+    
+    
+    <p>Quantity:
+    <lightning:formattedNumber value="{!v.item.Quantity__c}" style="number"/>
+    </p>
+    
+    
+    <p>
+    <lightning:input type="toggle"                            
+                         label="Packed?"                           
+                         name="packed"                         
+                         checked="{!v.item.Packed__c}" />
+    </p> 
+</aura:component>
