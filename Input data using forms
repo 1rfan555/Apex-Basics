@@ -1,0 +1,158 @@
+1.camping.cmp
+<aura:component >
+    <c:campingHeader/>
+    <c:campingList/>
+</aura:component>
+
+
+2.campingList.cmp
+<aura:component  >
+ <aura:attribute name="items" type="Camping_Item__c[]"/>
+    <aura:attribute name="newItem" type="Camping_Item__c" default="{ 'sobjectType': 'Camping_Item__c',
+                        'Name': '',
+                        'Quantity__c': 0,                                          
+                        'Price__c': 0,
+                        'Packed__c': false }"/>
+    <!--<ol>
+        <li>Bug Spray</li>
+        <li>Bear Repellant</li>
+        <li>Goat Food</li>
+    </ol>  -->
+    <!-- PAGE HEADER -->
+    
+    <c:campingHeader/>
+
+    <lightning:layout>
+        <lightning:layoutItem padding="around-small" size="6">
+   <div aria-labelledby="newcampaignform">
+                <fieldset class="slds-box slds-theme--default slds-container--small">
+        <legend id="newcampaignform" class="slds-text-heading--small slds-p-vertical--medium">
+                     Add Campaign List
+                    </legend> 
+                    <form class="slds-form--stacked">
+                        <lightning:input aura:id="campaignform" label="Campaign Item Name"
+                         name="campaignitemname"
+                         value="{!v.newItem.Name}"
+                         required="true"/>
+                        <lightning:input type="number" aura:id="expenseform" label="Quantity"
+                         name="campaignitemprice"
+                         min="1"
+                         formatter="number"
+                         step="0.1"
+                         value="{!v.newItem.Quantity__c}"
+                         messageWhenRangeUnderflow="Enter quantity that's at least 1."/>
+      <lightning:input type="number" aura:id="expenseform" label="Price"
+                         name="campaignitemprice"
+                         min="0.1"
+                         formatter="currency"
+                         step="0.01"
+                         value="{!v.newItem.Price__c}"
+                         messageWhenRangeUnderflow="Enter an amount that's at least $0.10."/>
+      <lightning:input type="checkbox" aura:id="expenseform" label="Packed?" 
+                         name="expreimbursed"
+                         checked="{!v.newItem.Packed__c}"/>
+       <lightning:button label="Create Camping" class="slds-m-top--medium"
+                                 variant="brand" onclick="{!c.clickCreateItem}"/>
+                    </form>
+                </fieldset>
+            </div>
+            
+  </lightning:layoutItem>
+    </lightning:layout>
+    <c:campingHeader/>
+
+  <div class="slds-card slds-p-top--medium">
+        <header class="slds-card__header">
+            <h3 class="slds-text-heading--small">Items</h3>
+        </header>
+         
+        <section class="slds-card__body">
+            <div id="list" class="row">
+                <aura:iteration items="{!v.items}" var="items">
+                    <c:campingListItem item="{!item}"/>
+                </aura:iteration>
+            </div>
+        </section>
+    </div>
+
+</aura:component>
+
+
+
+3.campingListHelper.js
+({
+    createCamping: function(component, item) {
+        var theitems = component.get("v.items");
+ 
+        var newitem = JSON.parse(JSON.stringify(item));
+ 
+        theitems.push(newitem);
+        component.set("v.items", theitems);
+        
+        component.set("v.newItem",{ 'sobjectType': 'Camping_Item__c','Name': '','Quantity__c': 0,
+                    'Price__c': 0,'Packed__c': false });
+    }
+})
+
+4.campingListController.js
+({
+ clickCreateItem: function(component, event, helper) {
+        var validCamping = component.find('campingform').reduce(function (validSoFar, inputCmp) {
+            // Displays error messages for invalid fields
+            inputCmp.showHelpMessageIfInvalid();
+            return validSoFar && inputCmp.get('v.validity').valid;
+        }, true);
+  if(validCamping){
+
+            var newCampingItem = component.get("v.newItem");
+            var campings = component.get("v.items");
+            var item = JSON.parse(JSON.stringify(newCampingItem));
+            campings.push(item);
+            component.set("v.items",campings);
+            component.set("v.newItem",{ 'sobjectType': 'Camping_Item__c','Name': '','Quantity__c': 0,
+                                           'Price__c': 0,'Packed__c': false });
+        }
+
+ }
+})
+
+
+
+5.campingItem.cmp
+
+<aura:component >
+    <aura:attribute name="item" type="Camping_Item__c"/>
+    
+    <p>Name:
+        <ui:outputText value="{!v.item.Name}"/>
+    </p>
+    <p>Quantity:
+        <ui:outputNumber value="{!v.item.Quantity__c}"/>
+    </p>
+    <p>Price:
+        <ui:outputCurrency value="{!v.item.Price__c}"/>
+    </p>
+    <p>Packed?:
+        <ui:outputCheckbox value="{!v.item.Packed__c}"/>
+    </p>
+</aura:component>
+
+
+6.campingHeader.cmp
+
+
+<aura:component >
+    
+    <lightning:layout class="slds-page-header slds-page-header--object-home">
+        <lightning:layoutItem>
+            <lightning:icon iconName="action:goal" alternativeText="My Camping List"/>
+        </lightning:layoutItem>
+        <lightning:layoutItem padding="horizontal-small">
+            <div class="page-section page-header">
+                <h1 class="slds-text-heading--label">Campaign List</h1>
+                <h2 class="slds-text-heading--medium">My Campaign List</h2>
+            </div>
+        </lightning:layoutItem>
+    </lightning:layout>
+    
+</aura:component>
