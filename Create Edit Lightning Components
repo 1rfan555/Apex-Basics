@@ -1,0 +1,32 @@
+1.camping.cmp
+
+<aura:component >
+    <c:campingHeader/>
+    <c:campingList/>
+</aura:component>
+
+
+2.campingHeader.cmp
+
+<aura:component >
+    <h1> Camping List </h1>
+</aura:component>
+
+//campingHeader.css
+
+  .THIS {
+}
+
+h1.THIS {
+    font-size: 18px;
+}
+
+3.campingList.cmp
+
+  <aura:component >
+    <ol>
+       <li>Bug Spray</li>
+       <li>Bear Repellant</li>
+       <li>Goat Food</li>      
+    </ol>
+</aura:component>
