@@ -1,0 +1,31 @@
+
+//Create vfpage first then create new vfp tab for that vfpage and add it to the mobile navigation to see page in Salesforce1 mobile app.
+
+//MobileContactList.vfp
+
+<apex:page standardController="contact" recordSetVar="contacts">
+
+<head>
+    <apex:slds />
+</head>
+<body>
+    <div class="slds-scope">
+         <div id="contact-list" class="slds-p-vertical--medium">
+                 <apex:repeat value="{!contacts}" var="c">
+                    <dl class="slds-list_horizontal slds-wrap">
+                      <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Name">Name : </dt>
+                      <dd class="slds-item_detail slds-truncate" title="Contact Name">{!c.Name}</dd>
+                        
+                      <dt class="slds-item_label slds-text-color_weak slds-truncate" title="Phone">Phone : </dt>
+                      <dd class="slds-item_detail slds-truncate" title="Contact Phone">{!c.Phone}</dd>
+                    </dl>
+                 </apex:repeat> </div>
+    
+
+    </div>
+
+
+</body>
+
+
+</apex:page>
