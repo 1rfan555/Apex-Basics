@@ -1,0 +1,15 @@
+//create obj-specific vfpage
+//add that obj-specific action to vfpage from obj-manager
+//add it to obj-specific page layout
+
+
+//ShowAssistantInfo.vfp
+<apex:page docType="html-5.0" standardController="Contact" title="Assistant Information">
+
+//dont ever try to think that whether asked fields are available on that obj or not....
+//just do what they say...its challenge bit****
+    <apex:variable var="AssistantName" value="{!Contact.AssistantName}" />
+    <apex:variable var="AssistantPhone" value="{!Contact.AssistantPhone}" />
+	<p>Assistant : {!AssistantName}</p>
+	<p>Phone : <a href="tel:{!AssistantPhone}">{!AssistantPhone}</a></p>
+</apex:page>
