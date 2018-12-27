@@ -1,0 +1,27 @@
+//create vfpage for sending business card through mail and enable it for lightning mobile
+//create global action for that page
+//add it to the publisher layout
+//BusinessCard.vfp
+
+<apex:page docType="html-5.0" title="Business Card">
+<apex:remoteObjects>
+        <apex:remoteObjectModel name="User" fields="Id, Email, FirstName, LastName, Phone, Title"/>
+    </apex:remoteObjects>
+    <div class = "Business Card">
+        <ul id = "userInfo"/> 
+        Email: <input type = "Email" id ="email"/>
+        <button onclick = "sendInfo()">Send</button>
+    </div>
+    
+<script>
+    var ul = document.getElementById("userInfo");
+    var email = document.getElementById("email").value;
+    var user = new SObjectModel.User();
+    var html="<li> First Name: " + "{!$User.FirstName}" + "</li>" + 
+        "<li> Last Name: " + "{!$User.LastName}" + "</li>"+
+        "<li> Email: " + "{!$User.Email}" + "</li>"+
+        "<li> Phone: " + "{!$User.Phone}" + "</li>"+
+        "<li> Title: " + "{!$User.Title}" + "</li>";
+    ul.innerHTML = html;
+</script>
+</apex:page>
