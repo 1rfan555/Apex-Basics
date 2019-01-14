@@ -1,0 +1,43 @@
+##ParkLocator.apxc
+
+public class ParkLocator {
+public static String[] country(String country){
+        ParkService.ParksImplPort Locator = new ParkService.ParksImplPort();
+        return Locator.byCountry(country);
+    }
+}
+
+
+##ParkLocatorTest.apxc
+
+@isTest
+public class ParkLocatorTest {
+@isTest static void testMock(){
+        test.setMock(WebserviceMock.class, new ParkServiceMock());
+        String[] parksName = ParkLocator.Country('India');
+        List<String> country = new List<String>();
+               	country.add('Inamdar National Park');
+                country.add('Riza National Park');
+                country.add('Shilpa National Park');
+        System.assertEquals(country, parksName, 'park names are not as expected');
+    }
+
+}
+
+
+##ParkServiceMock
+
+global class ParkServiceMock implements WebServiceMock {
+    
+    global void doInvoke(Object stub,Object request,Map<String, Object> response,String endpoint,
+           String soapAction,String requestName,String responseNS,String responseName,String responseType){
+        		ParkService.byCountryResponse response_x = new ParkService.byCountryResponse();
+                List<String> country = new List<String>();
+               	country.add('Inamdar Shola National Park');
+                country.add('Riza National Park');
+                country.add('Shilpa National Park');
+            	response_x.return_x = country;
+                response.put('response_x', response_x);
+    	}   
+
+}
