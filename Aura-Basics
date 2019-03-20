@@ -1,0 +1,371 @@
+#camping.cmp
+
+<aura:component >
+    <c:campingHeader/>
+    <c:campingList/>
+</aura:component>
+
+
+===============================================================================================================================
+#campingHeader.cmp
+
+<aura:component >
+    
+    <lightning:layout class="slds-page-header slds-page-header--object-home">
+        <lightning:layoutItem>
+            <lightning:icon iconName="action:goal" alternativeText="My Camping List"/>
+        </lightning:layoutItem>
+        <lightning:layoutItem padding="horizontal-small">
+            <div class="page-section page-header">
+                <h1 class="slds-text-heading--label">Campaign List</h1>
+                <h2 class="slds-text-heading--medium">My Campaign List</h2>
+            </div>
+        </lightning:layoutItem>
+    </lightning:layout>
+    
+</aura:component>
+
+
+#campingHeader.css
+
+.THIS {
+}
+
+h1.THIS {
+    font-size: 18px;
+}
+
+===============================================================================================================================
+#campingList.cmp
+
+<aura:component controller="campingListController">
+     <!--  <ol>
+         <li>Bug Spray</li>
+         <li>Bear Repellant</li>
+         <li>Goat Food</li>
+       </ol> -->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:handler name="addItem" event="c:addItemEvent" action="{!c.handleAddItem}"/>
+
+    <aura:attribute name="newItem" type="Camping_Item__c" required="true" default="{
+                                                       'sobjectType': 'Camping_Item__c',
+                                                          'Name': '',
+                                                          'Quantity__c':0,
+                                                           'Price__c':0,
+                                                           'Packed__c':false }"/>
+
+       <aura:attribute name="items" type="Camping_Item__c[]"/>
+   
+    <div class="slds-col slds-col--padded slds-p-top--large">
+       <c:campingListForm/>
+    </div>
+    <div class="slds-grid slds-m-top--large">
+
+       <fieldset class="slds-box slds-theme--default slds-container--small">
+            <legend id="newexpenseform1" class="slds-text-heading--small slds-p-vertical--medium">
+          Camping List
+         </legend>
+              <section class="slds-card__body">
+            <div id="list" class="row">
+                <aura:iteration items="{!v.items}" var="item">
+                    <c:campingListItem item="{!item}"/>
+                </aura:iteration>
+            </div>
+        </section>
+        </fieldset>
+    </div>   
+</aura:component>
+
+
+===============================================================================================================================
+#campingListController.js
+
+({
+    doInit: function(component, event, helper) {
+    // Create the action
+    var action = component.get("c.getItems");
+    // Add callback behavior for when response is received
+    action.setCallback(this, function(response) {
+        var state = response.getState();
+        if (component.isValid() && state === "SUCCESS") {
+            component.set("v.items", response.getReturnValue());
+        }
+        else {
+         console.log("Failed with state: " + state);
+       }
+    });
+
+    $A.enqueueAction(action);
+},
+    handleAddItem: function(component, event, helper) {
+        var item = event.getParam("item");
+        var action = component.get("c.saveItem");
+        action.setParams({
+            "campingItem": item
+        });
+        action.setCallback(this, function(response){
+            var state = response.getState();
+            if (component.isValid() && state === "SUCCESS") {       
+             var items = component.get("v.items");
+            items.push(response.getReturnValue());
+            component.set("v.items", items);
+            }
+        });
+        $A.enqueueAction(action);
+    },
+
+    clickCreateItem : function(component, event, helper) {
+         var validCamping = true;
+        // Name must not be blank
+        var nameField = component.find("name");
+        var name = nameField.get("v.value");
+        var quantityField = component.find("quantity");
+        var quantity = nameField.get("v.value");
+         var priceField = component.find("price");
+        var price = nameField.get("v.value");
+         if ($A.util.isEmpty(name)){
+            validCamping = false;
+            nameField.set("v.errors", [{message:"Camping name can't be blank."}]);
+        }
+        else {
+            nameField.set("v.errors", null);
+        }
+        
+         if ($A.util.isEmpty(quantity)){
+            validCamping = false;
+            quantityField.set("v.errors", [{message:"Camping quantity can't be blank."}]);
+        }
+        else {
+            quantityField.set("v.errors", null);
+        }
+        if ($A.util.isEmpty(price)){
+            validCamping = false;
+            priceField.set("v.errors", [{message:"Camping price can't be blank."}]);
+        }
+        else {
+            priceField.set("v.errors", null);
+        }
+        
+         if(validCamping){
+             var newItem = component.get("v.newItem");
+             console.log("Create item: " + JSON.stringify(newItem));
+             // var newItems = component.get("v.items");
+              //newItems.push(JSON.parse(JSON.stringify(newItem)));
+           //component.set("v.items", newItems);
+           helper.createItem(component, newItem);
+
+           component.set("v.newItem",{ 'sobjectType': 'Camping_Item__c','Name': '','Quantity__c': 0,
+                    'Price__c': 0,'Packed__c': false });
+
+
+       }
+    }
+})
+
+===============================================================================================================================
+
+
+#campingList.svg
+
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="120px" height="120px" viewBox="0 0 120 120" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+		<path d="M120,108 C120,114.6 114.6,120 108,120 L12,120 C5.4,120 0,114.6 0,108 L0,12 C0,5.4 5.4,0 12,0 L108,0 C114.6,0 120,5.4 120,12 L120,108 L120,108 Z" id="Shape" fill="#2A739E"/>
+		<path d="M77.7383308,20 L61.1640113,20 L44.7300055,63.2000173 L56.0543288,63.2000173 L40,99.623291 L72.7458388,54.5871812 L60.907727,54.5871812 L77.7383308,20 Z" id="Path-1" fill="#FFFFFF"/>
+	</g>
+</svg>
+
+
+===============================================================================================================================
+
+#campingList.auradoc
+
+<aura:documentation>
+	<aura:description>Documentation</aura:description>
+	<aura:example name="ExampleName" ref="exampleComponentName" label="Label">
+		Example Description
+	</aura:example>
+</aura:documentation>
+
+
+===============================================================================================================================
+
+#campingListItem.cmp
+
+<aura:component >
+    <aura:attribute name="item" type="Camping_Item__c" required="true"/>
+    
+    //refer object fields API for each fields given
+    <p>Name : <ui:outputText value="{!v.item.Name}"/></p>
+    
+    <p>Price:
+    <lightning:formattedNumber value="{!v.item.Price__c}" style="currency"/>
+    </p>
+    
+    
+    <p>Quantity:
+    <lightning:formattedNumber value="{!v.item.Quantity__c}" style="number"/>
+    </p>
+    
+    
+    <p>
+    <lightning:input type="toggle"                            
+                         label="Packed?"                           
+                         name="packed"                         
+                         checked="{!v.item.Packed__c}" />
+    </p>
+    <p>
+    <lightning:button label="Packed!"
+                      onClick="{!c.packItem}"/>
+    </p>
+    
+</aura:component>
+
+
+
+===============================================================================================================================
+#campingListItemController.js
+
+({
+	packItem: function(component, event, helper) {
+        var a = component.get("v.item",true);
+        a.Packed__c = true;
+        component.set("v.item",a);
+        var btnClicked = event.getSource();
+        btnClicked.set("v.disabled",true);
+    }
+})
+
+===============================================================================================================================
+#campingItem.cmp
+
+<aura:component >
+    <aura:attribute name="item" type="Camping_Item__c"/>
+    
+    <p>Name:
+        <ui:outputText value="{!v.item.Name}"/>
+    </p>
+    <p>Quantity:
+        <ui:outputNumber value="{!v.item.Quantity__c}"/>
+    </p>
+    <p>Price:
+        <ui:outputCurrency value="{!v.item.Price__c}"/>
+    </p>
+    <p>Packed?:
+        <ui:outputCheckbox value="{!v.item.Packed__c}"/>
+    </p>
+</aura:component>
+
+===============================================================================================================================
+
+#campingListForm.cmp
+
+<aura:component >
+     <aura:registerEvent name="addItem" type="c:addItemEvent"/>
+
+     <div aria-labelledby="newcampingform">
+         <fieldset class="slds-box slds-theme--default slds-container--small">
+    <legend id="newexpenseform" class="slds-text-heading--small slds-p-vertical--medium">
+      Camping
+    </legend>
+ 
+
+    <!-- CREATE NEW EXPENSE FORM -->
+    <form class="slds-form--stacked">
+      <lightning:input type="text"
+                         label="Camping Item Name"
+                         name="Name"
+                         value="{!v.newItem.Name}"
+                         required="true"/> 
+        <lightning:input type="number" aura:id="campinglistitemform" label="Quantity"
+                             name="itemquantity"
+                             min="1"
+                             step="1"
+                             value="{!v.newItem.Quantity__c}"
+                             placeholder="0"/>
+        <lightning:input type="number" aura:id="newItemForm" label="Price"
+                             name="Price"
+                             min="0.1"
+                             formatter="currency"
+                             step="0.01"
+                             value="{!v.newItem.Price__c}"
+                             messageWhenRangeUnderflow="Enter an amount that's at least $0.10."/>
+        <lightning:input type="checkbox" 
+                         label="Packed?"  
+                         name="Packed"
+                         checked="{!v.newItem.Packed__c}"/>
+        <lightning:button variant="brand"
+                         label="Create Camping Item" 
+                         class="slds-m-top--medium"
+                         onclick="{!c.clickCreateItem}"/>
+    </form>
+    
+  </fieldset>   
+    
+        
+        
+    </div>
+</aura:component>
+
+===============================================================================================================================
+#campingListFormController.js
+
+({
+    submitForm : function(component, event, helper) {
+             var validCamping = true;
+        // Name must not be blank
+        var nameField = component.find("name");
+        var name = nameField.get("v.value");
+        var quantityField = component.find("quantity");
+        var quantity = nameField.get("v.value");
+         var priceField = component.find("price");
+        var price = nameField.get("v.value");
+         if ($A.util.isEmpty(name)){
+            validCamping = false;
+            nameField.set("v.errors", [{message:"Camping name can't be blank."}]);
+        }
+        else {
+            nameField.set("v.errors", null);
+        }
+        
+         if ($A.util.isEmpty(quantity)){
+            validCamping = false;
+            quantityField.set("v.errors", [{message:"Camping quantity can't be blank."}]);
+        }
+        else {
+            quantityField.set("v.errors", null);
+        }
+        if ($A.util.isEmpty(price)){
+            validCamping = false;
+            priceField.set("v.errors", [{message:"Camping price can't be blank."}]);
+        }
+        else {
+            priceField.set("v.errors", null);
+        }
+        
+         if(validCamping){
+             //var newItem = component.get("v.newItem");
+             //console.log("Create item: " + JSON.stringify(newItem));
+             // var newItems = component.get("v.items");
+              //newItems.push(JSON.parse(JSON.stringify(newItem)));
+           //component.set("v.items", newItems);
+           helper.createItem(component);
+             
+         }
+    }
+})
+===============================================================================================================================
+#campingListFormHelper.js
+
+
+({
+    createItem : function(component) {
+        var newItem = component.get("v.newItem");
+        var addEvent = component.getEvent("addItem");
+        addEvent.setParams({"item" : newItem});
+        addEvent.fire();
+        component.set("v.newItem",{ 'sobjectType': 'Camping_Item__c','Name': '','Quantity__c': 0,
+                    'Price__c': 0,'Packed__c': false });
+
+    }
+})
