@@ -41,7 +41,7 @@ public class AccountProcessorTest {
         Set<Id> setAccId = new Set<ID>();
         setAccId.add(a.Id);
 
-        AccountProcessor.countContact(setAccId);       
+        AccountProcessor.countContacts(setAccId);       
 
         Account acc = [select Number_of_Contacts__c from Account where id = :a.id LIMIT 1];
         System.assertEquals(Integer.valueOf(acc.Number_of_Contacts__c) ,1);
